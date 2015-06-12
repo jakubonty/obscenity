@@ -2,7 +2,21 @@ module Obscenity
   class Base
     class << self
 
-      def blacklist
+      def locale_blacklist
+        return @locale_blacklist if @locale_blacklist
+        if Obscenity.config.locale_blacklist
+          @locale_blacklist = {}
+          Obscenity.config.locale_blacklist.each do |locale, file|
+            @locale_blacklist[locale] = YAML.load_file( file.to_s )
+          end
+        end
+        {}
+      end
+
+      def blacklist(locale=nil)
+        if locale
+          return locale_blacklist[locale] || []
+        end
         @blacklist ||= set_list_content(Obscenity.config.blacklist)
       end
 
@@ -14,21 +28,21 @@ module Obscenity
         @whitelist ||= set_list_content(Obscenity.config.whitelist)
       end
 
-      def whitelist=(value)
+      def whitelist=(value, locale)
         @whitelist = value == :default ? set_list_content(Obscenity::Config.new.whitelist) : value
       end
 
-      def profane?(text)
+      def profane?(text, locale=nil)
         return(false) unless text.to_s.size >= 3
-        blacklist.each do |foul|
+        blacklist(locale).each do |foul|
           return(true) if text =~ /\b#{foul}\b/i && !whitelist.include?(foul)
         end
         false
       end
 
-      def sanitize(text)
+      def sanitize(text, locale=nil)
         return(text) unless text.to_s.size >= 3
-        blacklist.each do |foul|
+        blacklist(locale).each do |foul|
           text.gsub!(/\b#{foul}\b/i, replace(foul)) unless whitelist.include?(foul)
         end
         @scoped_replacement = nil
@@ -40,10 +54,10 @@ module Obscenity
         self
       end
 
-      def offensive(text)
+      def offensive(text, locale)
         words = []
         return(words) unless text.to_s.size >= 3
-        blacklist.each do |foul|
+        blacklist(locale).each do |foul|
           words << foul if text =~ /\b#{foul}\b/i && !whitelist.include?(foul)
         end
         words.uniq
