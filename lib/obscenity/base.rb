@@ -14,10 +14,10 @@ module Obscenity
       end
 
       def blacklist(locale=nil)
-        if locale
-          return locale_blacklist[locale] || []
-        end
         @blacklist ||= set_list_content(Obscenity.config.blacklist)
+        if locale
+          return locale_blacklist[locale] || @blacklist
+        end
       end
 
       def blacklist=(value)
