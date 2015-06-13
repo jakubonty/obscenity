@@ -4,13 +4,13 @@ module Obscenity
 
       def locale_blacklist
         return @locale_blacklist if @locale_blacklist
+        @locale_blacklist = {}
         if Obscenity.config.locale_blacklist
-          @locale_blacklist = {}
           Obscenity.config.locale_blacklist.each do |locale, file|
             @locale_blacklist[locale] = YAML.load_file( file.to_s )
           end
         end
-        {}
+        @locale_blacklist
       end
 
       def blacklist(locale=nil)
