@@ -7,9 +7,9 @@ module Obscenity
     DEFAULT_BLACKLIST = File.dirname(__FILE__) + "/../../config/blacklist.yml"
 
     def initialize
+      @locale_blacklist = nil
       yield(self) if block_given?
       validate_config_options
-      @locale_blacklist = nil
     end
 
     def replacement

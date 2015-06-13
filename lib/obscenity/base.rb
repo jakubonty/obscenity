@@ -18,6 +18,7 @@ module Obscenity
         if locale
           return locale_blacklist[locale] || @blacklist
         end
+        @blacklist
       end
 
       def blacklist=(value)
