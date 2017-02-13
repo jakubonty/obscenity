@@ -36,7 +36,7 @@ module Obscenity
       def profane?(text, locale=nil)
         return(false) unless text.to_s.size >= 3
         blacklist(locale).each do |foul|
-          return(true) if text =~ /\b#{foul}\b/i && !whitelist.include?(foul)
+          return(true) if text.force_encoding('UTF-8') =~ /\b#{foul}\b/i && !whitelist.include?(foul)
         end
         false
       end
